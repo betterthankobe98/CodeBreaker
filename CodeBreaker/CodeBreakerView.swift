@@ -11,8 +11,19 @@ struct CodeBreakerView: View {
     
     @State var game = CodeBreaker()
     
+    static let missing = Color.clear
+    static let colorMap: [String : Color] = [
+        "brown" : .brown,
+        "yellow" : .yellow,
+        "purple" : .purple,
+        "gray" : .gray,
+        "blue" : .blue,
+        "orange" : .orange
+    ]
+    
     var body: some View {
         VStack {
+            restartButton
             view(for: game.masterCode)
             ScrollView {
                 view(for: game.guessCode)
@@ -20,11 +31,15 @@ struct CodeBreakerView: View {
                     view(for: game.temptCode[index])
                 }
             }
-            
-//            peg(colors: [.red, .primary, .primary, .blue])
-//            peg(colors: [.red, .yellow, .primary, .red])
         }
         .padding()
+    }
+    
+    var restartButton: some View {
+        Button("RESTART") {
+            game = CodeBreaker()
+        }
+        .font(.system(size:50))
     }
     
     var guessButton: some View {
@@ -36,13 +51,21 @@ struct CodeBreakerView: View {
     }
     
     func view(for code: Code) -> some View {
-//    func peg(colors: [Color]) -> some View {
         HStack{
             ForEach(code.pegs.indices, id: \.self) { number in
                 RoundedRectangle(cornerRadius: 10)
+                    .foregroundStyle(CodeBreakerView.colorMap[code.pegs[number]] ?? CodeBreakerView.missing)
+//                    .strokeBorder(code.kind == .guess ? Color.black : Color.clear, lineWidth: 2)
                     .contentShape(Rectangle())
                     .aspectRatio(1, contentMode: .fit)
-                    .foregroundStyle(code.pegs[number])
+                    
+                    .overlay {
+                        if CodeBreakerView.colorMap[code.pegs[number]] == nil {
+                            Text(code.pegs[number])
+                                .font(.system(size: 120))
+                                .minimumScaleFactor(9/120)
+                        }
+                    }
                     .onTapGesture {
                         if code.kind == .guess {
                             game.changeGuessPeg(at: number)

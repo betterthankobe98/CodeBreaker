@@ -28,7 +28,6 @@ struct MatchMarkers: View {
                 Matchers(peg: 5)
             }
         }
-        .padding()
     }
     
     func Matchers(peg: Int) -> some View {
