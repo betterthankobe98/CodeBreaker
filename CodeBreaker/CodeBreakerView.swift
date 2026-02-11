@@ -71,10 +71,16 @@ struct CodeBreakerView: View {
                         }
                     }
             }
-            MatchMarkers(matches: code.matches)
+            Rectangle()
+                .aspectRatio(1, contentMode: .fit)
+                .foregroundStyle(.clear)
                 .overlay {
-                    if code.kind == .guess {
-                        guessButton
+                    if let matches = code.matches {
+                        MatchMarkers(matches: matches)
+                    } else {
+                        if code.kind == .guess {
+                            guessButton
+                        }
                     }
                 }
         }

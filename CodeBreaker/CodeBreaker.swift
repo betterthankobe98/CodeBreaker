@@ -36,7 +36,7 @@ struct CodeBreaker {
     mutating func playGuess() {
         var currentGuess = guessCode
         currentGuess.kind = .tempt(currentGuess.match(against: masterCode))
-        if temptCode.contains(currentGuess) || currentGuess.pegs.allSatisfy({ $0 == Code.missing }) {
+        if temptCode.contains(currentGuess) || currentGuess.pegs.allSatisfy({ $0 == Peg.missingPeg }) {
             return
         }
         temptCode.append(currentGuess)
@@ -47,22 +47,26 @@ struct CodeBreaker {
         if let ExistingIndexofCurrentPeg = pegChoice.firstIndex(of: currentPeg) {
             guessCode.pegs[index] = pegChoice[(ExistingIndexofCurrentPeg + 1) % pegChoice.count]
         } else {
-            guessCode.pegs[index] = pegChoice.first ?? Code.missing
+            guessCode.pegs[index] = pegChoice.first ?? Peg.missingPeg
         }
     }
     
 }
 
+
+extension Peg {
+    static let missingPeg: Peg = ""
+}
+
+
 struct Code: Equatable {
-    
-    static let missing: Peg = ""
     
     var kind: Kind
     var pegs: [Peg]
     
     init(kind: Kind, pegsCount: Int) {
         self.kind = kind
-        self.pegs = Array(repeating: Code.missing, count: pegsCount)
+        self.pegs = Array(repeating: Peg.missingPeg, count: pegsCount)
     }
        
     enum Kind: Equatable {
@@ -71,36 +75,56 @@ struct Code: Equatable {
         case tempt([Match])
     }
     
-    var matches: [Match] {
+    var matches: [Match]? {
         switch kind {
             case .tempt(let matches): return matches
-            default: return []
+            default: return nil
         }
     }
     
     mutating func randomize(count: Int, from pegChoices: [Peg]) {
         for index in 0..<count {
-            pegs[index] = pegChoices.randomElement() ?? Code.missing
+            pegs[index] = pegChoices.randomElement() ?? Peg.missingPeg
         }
     }
     
     func match(against otherCode: Code) -> [Match] {
-        var results: [Match] = Array(repeating: .wrong, count: pegs.count)
+        // function programming version: map
         var pegsToMatch = otherCode.pegs
-        for index in pegs.indices.reversed() {
+        let exactMatchInReverse = pegs.indices.reversed().map { index in
             if pegsToMatch.count > index, pegsToMatch[index] == pegs[index] {
-                results[index] = .right
                 pegsToMatch.remove(at: index)
+                return Match.right
+            } else {
+                return .wrong
             }
         }
-        for index in pegs.indices {
-            if results[index] != .right {
-                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
-                    results[index] = .half
-                    pegsToMatch.remove(at: matchIndex)
-                }
+        let exactMatch = Array(exactMatchInReverse.reversed())
+        return pegs.indices.map { index in
+            if exactMatch[index] != Match.right, let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
+                pegsToMatch.remove(at: matchIndex)
+                return .half
+            } else {
+                return exactMatch[index]
             }
         }
-        return results
+        // old version
+//        var results: [Match] = Array(repeating: .wrong, count: pegs.count)
+//        var pegsToMatch = otherCode.pegs
+//        for index in pegs.indices.reversed() {
+//            if pegsToMatch.count > index, pegsToMatch[index] == pegs[index] {
+//                results[index] = .right
+//                pegsToMatch.remove(at: index)
+//            }
+//        }
+//        for index in pegs.indices {
+//            if results[index] != .right {
+//                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
+//                    results[index] = .half
+//                    pegsToMatch.remove(at: matchIndex)
+//                }
+//            }
+//        }
+//        return results
     }
 }
