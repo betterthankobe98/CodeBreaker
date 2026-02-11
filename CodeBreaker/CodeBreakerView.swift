@@ -54,11 +54,10 @@ struct CodeBreakerView: View {
         HStack{
             ForEach(code.pegs.indices, id: \.self) { number in
                 RoundedRectangle(cornerRadius: 10)
-                    .foregroundStyle(CodeBreakerView.colorMap[code.pegs[number]] ?? CodeBreakerView.missing)
-//                    .strokeBorder(code.kind == .guess ? Color.black : Color.clear, lineWidth: 2)
+                    .fill(CodeBreakerView.colorMap[code.pegs[number]] ?? CodeBreakerView.missing)
+                    .strokeBorder(code.kind == .guess ? Color.primary : Color.clear, lineWidth: 1)
                     .contentShape(Rectangle())
                     .aspectRatio(1, contentMode: .fit)
-                    
                     .overlay {
                         if CodeBreakerView.colorMap[code.pegs[number]] == nil {
                             Text(code.pegs[number])

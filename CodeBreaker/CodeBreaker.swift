@@ -11,7 +11,7 @@ typealias Peg = String
 
 struct CodeBreaker {
     
-    static let supportedemojis = ["💜","🖤","🧡","💚","💛", "💙"]
+    static let supportedemojis = ["💜","🩵","🧡","💚","💛","💙"]
     static let supportedColors = ["brown", "yellow", "purple", "gray", "blue", "orange"]
     
     var masterCode: Code
@@ -27,7 +27,7 @@ struct CodeBreaker {
         } else {
             pegChoice = CodeBreaker.supportedemojis
         }
-        self.pegCounts = Int.random(in: 3...6)
+        pegCounts = Int.random(in: 3...6)
         masterCode = Code(kind: .master, pegsCount: pegCounts)
         guessCode = Code(kind: .guess, pegsCount: pegCounts)
         masterCode.randomize(count: pegCounts, from: pegChoice)
@@ -35,7 +35,7 @@ struct CodeBreaker {
     
     mutating func playGuess() {
         var currentGuess = guessCode
-        currentGuess.kind = .tempt(guessCode.match(against: masterCode))
+        currentGuess.kind = .tempt(currentGuess.match(against: masterCode))
         if temptCode.contains(currentGuess) || currentGuess.pegs.allSatisfy({ $0 == Code.missing }) {
             return
         }
