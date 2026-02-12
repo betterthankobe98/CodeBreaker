@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     
-    // MARK: Data In
+    // MARK: Data Owned by Me
     @State private var game = CodeBreaker()
     @State private var selection = 0
     
