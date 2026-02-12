@@ -13,8 +13,12 @@ enum Match {
     case half
 }
 
-struct MatchMarkers: View {
+struct MatchMarkerView: View {
+    
+    // MARK: Data In
     var matches: [Match]
+    
+    // MARK: - Body
     var body: some View {
         VStack{
             HStack{
@@ -71,7 +75,7 @@ struct Line: View {
                 Circle()
                     .foregroundStyle(.primary)
             }
-            MatchMarkers(matches: [.half, .right, .wrong, .right, .right])
+            MatchMarkerView(matches: [.half, .right, .wrong, .right, .right])
         }.padding()
         
     }
