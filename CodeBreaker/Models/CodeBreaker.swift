@@ -7,8 +7,6 @@
 
 import Foundation
 
-typealias Peg = String
-
 struct CodeBreaker {
     
     static let supportedemojis = ["💜","🩵","🧡","💚","💛","💙"]
@@ -66,11 +64,3 @@ struct CodeBreaker {
     }
     
 }
-
-
-extension Peg {
-    static let missingPeg: Peg = ""
-}
-
-
-

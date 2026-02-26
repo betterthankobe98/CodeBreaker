@@ -47,7 +47,12 @@ struct CodeView: View {
 }
 
 #Preview {
+    let acode: Code = {
+            var code = Code(kind: .guess, pegsCount: 5)
+            code.randomize(count: 5, from: ["💜","🩵","🧡"])
+            return code
+        }()
     HStack {
-        CodeView(code: Code(kind: .master(isHidden: true), pegsCount: 5), selection: Binding<Int>.constant(3))
+        CodeView(code: acode, selection: Binding<Int>.constant(3))
     }.padding()
 }

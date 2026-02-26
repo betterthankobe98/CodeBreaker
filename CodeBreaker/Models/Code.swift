@@ -8,6 +8,12 @@
 
 import Foundation
 
+typealias Peg = String
+
+extension Peg {
+    static let missingPeg: Peg = ""
+}
+
 struct Code: Equatable {
     
     var kind: Kind
