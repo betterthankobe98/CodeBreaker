@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CodeView: View {
+struct CodeView<MyCustomView>: View where MyCustomView: View {
     
     // MARK: Data In
     let code: Code
@@ -15,35 +15,54 @@ struct CodeView: View {
     // MARK: Data Shared Between Views
     @Binding var selection: Int
     
-    // MARK: - Body
-    var body: some View {
-        ForEach(code.pegs.indices, id: \.self) { number in
-            PegView(peg: code.pegs[number])
-                .background {
-                    if number == selection, code.kind == .guess {
-                        Selection.shape
-                            .foregroundStyle(Selection.color)
-                    }
-                }
-                .overlay{
-                    Selection.shape
-                        .foregroundStyle(code.isHidden ? Color.gray : Color.clear)
-                }
-                .onTapGesture {
-                    if code.kind == .guess {
-//                            game.changeGuessPeg(at: number)
-                        selection = number
-                    }
-                }
-            }
+    // MARK: Data In Func
+    @ViewBuilder private let myView: () -> MyCustomView
+    
+    init(code: Code,
+         selection: Binding<Int> = .constant(-1),
+         @ViewBuilder myView: @escaping () -> MyCustomView = { EmptyView() }
+    ){
+        self.code = code
+        self._selection = selection
+        self.myView = myView
     }
     
-    struct Selection {
-        static let border: CGFloat = 5
-        static let cornerRadius: CGFloat = 10
-        static let color: Color = Color.gray(0.85)
-        static let shape = RoundedRectangle(cornerRadius: cornerRadius)
+    // MARK: - Body
+    var body: some View {
+        HStack{
+            ForEach(code.pegs.indices, id: \.self) { number in
+                PegView(peg: code.pegs[number])
+                    .background {
+                        if number == selection, code.kind == .guess {
+                            Selection.shape
+                                .foregroundStyle(Selection.color)
+                        }
+                    }
+                    .overlay{
+                        Selection.shape
+                            .foregroundStyle(code.isHidden ? Color.gray : Color.clear)
+                    }
+                    .onTapGesture {
+                        if code.kind == .guess {
+    //                            game.changeGuessPeg(at: number)
+                            selection = number
+                        }
+                    }
+                }
+            Color.clear.aspectRatio(1, contentMode: .fit)
+                .background {
+                    myView()
+                }
+        }
+        
     }
+}
+
+fileprivate struct Selection {
+    static let border: CGFloat = 5
+    static let cornerRadius: CGFloat = 10
+    static let color: Color = Color.gray(0.85)
+    static let shape = RoundedRectangle(cornerRadius: cornerRadius)
 }
 
 #Preview {

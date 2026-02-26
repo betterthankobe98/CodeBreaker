@@ -17,13 +17,19 @@ struct CodeBreakerView: View {
     var body: some View {
         VStack {
             restartButton
-            view(for: game.masterCode)
+            CodeView(code: game.masterCode)
             ScrollView {
                 if !game.isOver {
-                    view(for: game.guessCode)
+                    CodeView(code: game.guessCode, selection: $selection) {
+                        guessButton
+                    }
                 }
                 ForEach(game.temptCode.indices.reversed(), id: \.self) { index in
-                    view(for: game.temptCode[index])
+                    CodeView(code: game.temptCode[index]) {
+                        if let matches = game.temptCode[index].matches {
+                            MatchMarkerView(matches: matches)
+                        }
+                    }
                 }
             }
             PegChooserView(pegs: game.pegChoice) { peg in 
@@ -49,22 +55,6 @@ struct CodeBreakerView: View {
         }
         .font(.system(size:GuessButton.maximumFontSize))
         .minimumScaleFactor(GuessButton.scaleFactor)
-    }
-    
-    func view(for code: Code) -> some View {
-        HStack{
-            CodeView(code: code, selection: $selection)
-            Color.clear.aspectRatio(1, contentMode: .fit)
-                .overlay {
-                    if let matches = code.matches {
-                        MatchMarkerView(matches: matches)
-                    } else {
-                        if code.kind == .guess {
-                            guessButton
-                        }
-                    }
-                }
-        }
     }
     
     struct GuessButton {
